@@ -9,7 +9,8 @@ object MemoryVisibilityProblem2 extends App {
   runner.asyncRun((name) => println(s"${name} is finished. Totally finished."))
 }
 
-class AsyncRunner2(private[this] val name: String, private[this] val canStart: () => Boolean) {
+class AsyncRunner2(private[this] val name: String,
+                   private[this] val canStart: () => Boolean) {
   private[this] var isFinished = false
 
   def asyncRun(f: String => Unit): Unit = {
@@ -22,5 +23,9 @@ class AsyncRunner2(private[this] val name: String, private[this] val canStart: (
     }).start()
   }
 
-  def canNextStart: () => Boolean = () => this.isFinished
+  def setIsFinished(value: Boolean) = synchronized {
+    isFinished = value
+  }
+
+  def canNextStart: () => Boolean = () => synchronized { this.isFinished }
 }
